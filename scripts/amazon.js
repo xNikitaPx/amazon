@@ -1,5 +1,6 @@
 "use strict";
 
+import { products } from "../data/products.js";
 import { cart } from "../data/cart.js";
 
 const productGrid = document.querySelector(".js-products-grid");
