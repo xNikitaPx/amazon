@@ -1,4 +1,4 @@
-import { cart } from "../data/cart.js";
+import { cart, deleteFromCart } from "../data/cart.js";
 import { products } from "../data/products.js";
 import { formatCurrency } from "./utils/money.js";
 
@@ -10,7 +10,9 @@ orderSummary.innerHTML = cart
       (product) => product.id === cartItem.productId
     );
 
-    return `<div class="cart-item-container">
+    return `<div class="cart-item-container js-cart-item-container-${
+      matchingProduct.id
+    }">
             <div class="delivery-date">Delivery date: Tuesday, June 21</div>
 
             <div class="cart-item-details-grid">
@@ -33,7 +35,9 @@ orderSummary.innerHTML = cart
                   <span class="update-quantity-link link-primary">
                     Update
                   </span>
-                  <span class="delete-quantity-link link-primary">
+                  <span class="delete-quantity-link link-primary js-delete-quantity-link" data-product-id="${
+                    matchingProduct.id
+                  }">
                     Delete
                   </span>
                 </div>
@@ -48,7 +52,7 @@ orderSummary.innerHTML = cart
                     type="radio"
                     checked
                     class="delivery-option-input"
-                    name="delivery-option-${matchingProduct.productId}"
+                    name="delivery-option-${matchingProduct.id}"
                   />
                   <div>
                     <div class="delivery-option-date">Tuesday, June 21</div>
@@ -59,7 +63,7 @@ orderSummary.innerHTML = cart
                   <input
                     type="radio"
                     class="delivery-option-input"
-                    name="delivery-option-${matchingProduct.productId}"
+                    name="delivery-option-${matchingProduct.id}"
                   />
                   <div>
                     <div class="delivery-option-date">Wednesday, June 15</div>
@@ -70,7 +74,7 @@ orderSummary.innerHTML = cart
                   <input
                     type="radio"
                     class="delivery-option-input"
-                    name="delivery-option-${matchingProduct.productId}"
+                    name="delivery-option-${matchingProduct.id}"
                   />
                   <div>
                     <div class="delivery-option-date">Monday, June 13</div>
@@ -82,3 +86,17 @@ orderSummary.innerHTML = cart
           </div>`;
   })
   .join("");
+
+const deleteBtns = document.querySelectorAll(".js-delete-quantity-link");
+
+deleteBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const productId = btn.dataset.productId;
+    deleteFromCart(productId);
+
+    const cartItem = document.querySelector(
+      `.js-cart-item-container-${productId}`
+    );
+    cartItem.remove();
+  });
+});
