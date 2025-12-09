@@ -70,6 +70,8 @@ function updateCartQuantity() {
   }, 0);
 }
 
+updateCartQuantity();
+
 function addMessage(productId) {
   const addMessage = document.querySelector(`.js-added-to-cart${productId}`);
 

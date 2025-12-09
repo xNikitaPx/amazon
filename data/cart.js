@@ -1,4 +1,4 @@
-let cart = [
+let cart = JSON.parse(localStorage.getItem("cart")) ?? [
   {
     productId: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
     quantity: 2,
@@ -8,6 +8,10 @@ let cart = [
     quantity: 1,
   },
 ];
+
+function saveToStorage() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
 
 function addToCart(productId) {
   let matchingItem;
@@ -32,10 +36,13 @@ function addToCart(productId) {
       quantity,
     });
   }
+
+  saveToStorage();
 }
 
 function deleteFromCart(productId) {
   cart = cart.filter((cartItem) => productId !== cartItem.productId);
+  saveToStorage();
 }
 
 export { cart, addToCart, deleteFromCart };
