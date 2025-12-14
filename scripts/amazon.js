@@ -1,12 +1,35 @@
-import { products } from "../data/products.js";
-import { cart, addToCart, calculateCartQuantity } from "../data/cart.js";
-import { formatCurrency } from "./utils/money.js";
+import { products, loadProducts } from "../data/products.js";
+import { addToCart, calculateCartQuantity } from "../data/cart.js";
 
-const productGrid = document.querySelector(".js-products-grid");
+function renderProductsGrid() {
+  const productGrid = document.querySelector(".js-products-grid");
+  const searchBtn = document.querySelector(".js-search-button");
+  const searchBar = document.querySelector(".js-search-bar");
 
-productGrid.innerHTML = products
-  .map((product) => {
-    return `<div class="product-container">
+  const url = new URL(window.location.href);
+  const search = url.searchParams.get("search");
+
+  let filteredProducts = products;
+
+  if (search) {
+    filteredProducts = products.filter((product) => {
+      let matchingKeywords = false;
+
+      product.keywords.forEach((keyword) => {
+        if (keyword.toLowerCase().includes(search.toLowerCase())) {
+          matchingKeywords = true;
+        }
+      });
+      return (
+        matchingKeywords ||
+        product.name.toLowerCase().includes(search.toLowerCase())
+      );
+    });
+  }
+
+  productGrid.innerHTML = filteredProducts
+    .map((product) => {
+      return `<div class="product-container">
           <div class="product-image-container">
             <img
               class="product-image"
@@ -21,16 +44,14 @@ productGrid.innerHTML = products
           <div class="product-rating-container">
             <img
               class="product-rating-stars"
-              src="images/ratings/rating-${product.rating.stars * 10}.png"
+              src=${product.getStarsUrl()}
             />
             <div class="product-rating-count link-primary">${
               product.rating.count
             }</div>
           </div>
 
-          <div class="product-price">$${formatCurrency(
-            product.priceCents
-          )}</div>
+          <div class="product-price">${product.getPrice()}</div>
 
           <div class="product-quantity-container">
             <select class="js-quantity-selector-${product.id}">
@@ -47,6 +68,8 @@ productGrid.innerHTML = products
             </select>
           </div>
 
+          ${product.extraInfoHTML()}
+
           <div class="product-spacer"></div>
 
           <div class="added-to-cart js-added-to-cart${product.id}">
@@ -54,37 +77,65 @@ productGrid.innerHTML = products
             Added
           </div>
 
-          <button class="add-to-cart-button button-primary js-add-to-card" data-product-id="${
+          <button class="add-to-cart-button button-primary js-add-to-cart" data-product-id="${
             product.id
           }">Add to Cart</button>
         </div>`;
-  })
-  .join("");
+    })
+    .join("");
 
-const addBtns = document.querySelectorAll(".js-add-to-card");
-const cartQuantity = document.querySelector(".js-cart-quantity");
+  const addBtns = document.querySelectorAll(".js-add-to-cart");
+  const cartQuantity = document.querySelector(".js-cart-quantity");
 
-function updateCartQuantity() {
-  cartQuantity.innerText = calculateCartQuantity() || "";
-}
+  function updateCartQuantity() {
+    cartQuantity.innerText = calculateCartQuantity() || "";
+  }
 
-updateCartQuantity();
+  updateCartQuantity();
 
-function addMessage(productId) {
-  const addMessage = document.querySelector(`.js-added-to-cart${productId}`);
+  function addMessage(productId) {
+    const addMessage = document.querySelector(`.js-added-to-cart${productId}`);
 
-  addMessage.classList.add("added-to-cart-visible");
-  setTimeout(() => {
-    addMessage.classList.remove("added-to-cart-visible");
-  }, 2000);
-}
+    addMessage.classList.add("added-to-cart-visible");
+    setTimeout(() => {
+      addMessage.classList.remove("added-to-cart-visible");
+    }, 2000);
+  }
 
-addBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const productId = btn.dataset.productId;
+  addBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const productId = btn.dataset.productId;
+      const quantitySelector = document.querySelector(
+        `.js-quantity-selector-${productId}`
+      );
+      const quantity = +quantitySelector.value;
 
-    addToCart(productId);
-    addMessage(productId);
-    updateCartQuantity();
+      addToCart(productId, quantity);
+      addMessage(productId);
+      updateCartQuantity();
+    });
   });
-});
+
+  searchBtn.addEventListener("click", () => {
+    const search = searchBar.value;
+    window.location.href = `amazon.html?search=${search}`;
+  });
+
+  searchBar.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      const search = searchBar.value;
+      window.location.href = `amazon.html?search=${search}`;
+    }
+  });
+}
+
+async function loadPage() {
+  try {
+    await loadProducts();
+  } catch (error) {
+    console.log("Unexpected error. Please try again later.");
+  }
+  renderProductsGrid();
+}
+
+loadPage();

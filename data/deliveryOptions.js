@@ -1,3 +1,5 @@
+import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
+
 const deliveryOptions = [
   {
     id: "1",
@@ -23,4 +25,11 @@ function getDeliveryOption(deliveryOptionId) {
   );
 }
 
-export { deliveryOptions, getDeliveryOption };
+function calculateDeliveryDate(deliveryOption) {
+  const today = dayjs();
+  let deliveryDate = today.add(deliveryOption.deliveryDays, "days");
+  const dateString = deliveryDate.format("dddd, MMMM D");
+  return dateString;
+}
+
+export { deliveryOptions, getDeliveryOption, calculateDeliveryDate };
