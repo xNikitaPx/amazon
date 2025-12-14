@@ -1,6 +1,6 @@
 import { getOrder } from "../data/orders.js";
 import { getProduct, loadProducts } from "../data/products.js";
-import { calculateCartQuantity } from "../data/cart.js";
+import { cart } from "../data/cart-class.js";
 import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
 
 async function loadPage() {
@@ -83,7 +83,7 @@ function randerTracking() {
   const cartQuantity = document.querySelector(".js-cart-quantity");
 
   function updateCartQuantity() {
-    cartQuantity.innerText = calculateCartQuantity() || "";
+    cartQuantity.innerText = cart.calculateCartQuantity() || "";
   }
   updateCartQuantity();
 }

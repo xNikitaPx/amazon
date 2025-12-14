@@ -2,37 +2,32 @@ class Cart {
   #localStorageKey;
   constructor(localStorageKey) {
     this.#localStorageKey = localStorageKey;
+    this.cartItem = this.#loadFromStorage() ?? [
+      {
+        productId: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
+        quantity: 2,
+        deliveryOptionId: "1",
+      },
+      {
+        productId: "15b6fc6f-327a-4ec4-896f-486349e85a3d",
+        quantity: 1,
+        deliveryOptionId: "2",
+      },
+    ];
   }
-
-  cartItem = this.#loadFromStorage() ?? [
-    {
-      productId: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
-      quantity: 2,
-      deliveryOptionId: "1",
-    },
-    {
-      productId: "15b6fc6f-327a-4ec4-896f-486349e85a3d",
-      quantity: 1,
-      deliveryOptionId: "2",
-    },
-  ];
 
   saveToStorage() {
     localStorage.setItem(this.#localStorageKey, JSON.stringify(this.cartItem));
   }
 
   #loadFromStorage() {
-    JSON.parse(localStorage.getItem(this.#localStorageKey));
+    return JSON.parse(localStorage.getItem(this.#localStorageKey));
   }
 
-  addToCart(productId) {
-    let matchingItem;
-
-    this.cartItem.forEach((cartItem) => {
-      if (productId === cartItem.productId) {
-        matchingItem = cartItem;
-      }
-    });
+  addToCart(productId, quantity) {
+    const matchingItem = this.cartItem.find(
+      (cartItem) => productId === cartItem.productId
+    );
 
     if (matchingItem) {
       matchingItem.quantity += quantity;
@@ -60,23 +55,19 @@ class Cart {
     }, 0);
   }
 
-  updateQuantity(productId, quantityInput) {
+  updateQuantity(productId, quantity) {
     this.cartItem.forEach((cartItem) => {
       if (cartItem.productId === productId) {
-        cartItem.quantity = +quantityInput.value;
+        cartItem.quantity = quantity;
       }
     });
     this.saveToStorage();
   }
 
   updateDeliveryOption(productId, deliveryOptionId) {
-    let matchingItem;
-
-    this.cartItem.forEach((cartItem) => {
-      if (productId === cartItem.productId) {
-        matchingItem = cartItem;
-      }
-    });
+    const matchingItem = this.cartItem.find(
+      (cartItem) => productId === cartItem.productId
+    );
 
     matchingItem.deliveryOptionId = deliveryOptionId;
 
@@ -84,9 +75,11 @@ class Cart {
   }
 
   resetCart() {
-    cart = [];
+    this.cartItem = [];
     this.saveToStorage();
   }
 }
 
 const cart = new Cart("cart-oop");
+
+export { cart };

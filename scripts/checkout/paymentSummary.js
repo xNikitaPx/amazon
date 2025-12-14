@@ -1,4 +1,4 @@
-import { cart, calculateCartQuantity, resetCart } from "../../data/cart.js";
+import { cart } from "../../data/cart-class.js";
 import { getProduct } from "../../data/products.js";
 import { getDeliveryOption } from "../../data/deliveryOptions.js";
 import { formatCurrency } from "../utils/money.js";
@@ -9,7 +9,7 @@ function renderPaymenSummary() {
   let productPriceCents = 0;
   let shippingPriceCents = 0;
 
-  cart.forEach((cartItem) => {
+  cart.cartItem.forEach((cartItem) => {
     const matchingProduct = getProduct(cartItem.productId);
     const deliveryOption = getDeliveryOption(cartItem.deliveryOptionId);
 
@@ -25,7 +25,7 @@ function renderPaymenSummary() {
           <div class="payment-summary-title">Order Summary</div>
 
           <div class="payment-summary-row">
-            <div>Items (${calculateCartQuantity()}):</div>
+            <div>Items (${cart.calculateCartQuantity()}):</div>
             <div class="payment-summary-money">$${formatCurrency(
               productPriceCents
             )}</div>
@@ -73,7 +73,7 @@ function renderPaymenSummary() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          cart,
+          cart: cart.cartItem,
         }),
       });
 
@@ -83,7 +83,7 @@ function renderPaymenSummary() {
       console.log("Unexpected error. Try again later.");
     }
 
-    resetCart();
+    cart.resetCart();
 
     window.location.href = "orders.html";
   });

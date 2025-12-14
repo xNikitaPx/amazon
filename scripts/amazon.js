@@ -1,5 +1,5 @@
 import { products, loadProducts } from "../data/products.js";
-import { addToCart, calculateCartQuantity } from "../data/cart.js";
+import { cart } from "../data/cart-class.js";
 
 function renderProductsGrid() {
   const productGrid = document.querySelector(".js-products-grid");
@@ -88,7 +88,7 @@ function renderProductsGrid() {
   const cartQuantity = document.querySelector(".js-cart-quantity");
 
   function updateCartQuantity() {
-    cartQuantity.innerText = calculateCartQuantity() || "";
+    cartQuantity.innerText = cart.calculateCartQuantity() || "";
   }
 
   updateCartQuantity();
@@ -110,7 +110,7 @@ function renderProductsGrid() {
       );
       const quantity = +quantitySelector.value;
 
-      addToCart(productId, quantity);
+      cart.addToCart(productId, quantity);
       addMessage(productId);
       updateCartQuantity();
     });

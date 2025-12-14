@@ -1,10 +1,4 @@
-import {
-  cart,
-  deleteFromCart,
-  calculateCartQuantity,
-  updateQuantity,
-  updateDeliveryOption,
-} from "../../data/cart.js";
+import { cart } from "../../data/cart-class.js";
 import { getProduct } from "../../data/products.js";
 import { formatCurrency } from "../utils/money.js";
 import {
@@ -18,7 +12,7 @@ function renderOrderSummary() {
   const orderSummary = document.querySelector(".js-order-summary");
   const quantityHeader = document.querySelector(".js-return-to-home");
 
-  orderSummary.innerHTML = cart
+  orderSummary.innerHTML = cart.cartItem
     .map((cartItem) => {
       const matchingProduct = getProduct(cartItem.productId);
 
@@ -107,7 +101,7 @@ function renderOrderSummary() {
   }
 
   function updateCartQuantity() {
-    quantityHeader.innerText = `${calculateCartQuantity()} items`;
+    quantityHeader.innerText = `${cart.calculateCartQuantity()} items`;
   }
 
   updateCartQuantity();
@@ -120,7 +114,7 @@ function renderOrderSummary() {
   deleteBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       const productId = btn.dataset.productId;
-      deleteFromCart(productId);
+      cart.deleteFromCart(productId);
 
       updateCartQuantity();
       renderOrderSummary();
@@ -155,8 +149,10 @@ function renderOrderSummary() {
         `.js-quantity-label-${productId}`
       );
 
-      updateQuantity(productId, quantityInput);
-      quantityLabel.innerText = +quantityInput.value;
+      const quantity = +quantityInput.value;
+
+      cart.updateQuantity(productId, quantity);
+      quantityLabel.innerText = quantity;
       updateCartQuantity();
       renderPaymenSummary();
     });
@@ -165,7 +161,7 @@ function renderOrderSummary() {
   deliveryVariants.forEach((element) => {
     element.addEventListener("click", () => {
       const { productId, deliveryOptionId } = element.dataset;
-      updateDeliveryOption(productId, deliveryOptionId);
+      cart.updateDeliveryOption(productId, deliveryOptionId);
       renderOrderSummary();
       renderPaymenSummary();
     });
